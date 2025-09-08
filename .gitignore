@@ -35,7 +35,6 @@
 *.i*86
 *.x86_64
 *.hex
-*
 
 # Debug files
 *.dSYM/
@@ -63,3 +62,12 @@ dkms.conf
 *.tmp
 *.temp
 *.log
+
+# Meu programas binarios
+aloMundo
+contadorErrado
+contadorCerto
+fibonacci
+fibonacci-threads
+outraStack
+parametro
