@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <pthread.h>
+#include <unistd.h>
 
 void *thread(void *vargp);
 
@@ -18,6 +19,7 @@ int main (void) {
 
 	for (i=0; i<2; i++)
 		pthread_create(&tid, NULL, thread, (void *) i);
+	fprintf(stderr, "Fim da thread principal\n");
 	pthread_exit(NULL);
 
 	return 0;
@@ -29,6 +31,7 @@ void *thread(void *vargp) {
 
 	id = (long) vargp;
 	printf ("Thread %d: %s (sVar = %d)\n", id, p[id], ++sVar);
+	sleep (30);
 
 	return NULL;
 }

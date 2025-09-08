@@ -50,20 +50,20 @@ void *contador(void *pArg) {
 void inicializaSemaforo(sem_t *pSemaforo, int pshared, unsigned valor) {
 	if(sem_init(pSemaforo, pshared, valor) == -1) {
 		fprintf(stderr, "Erro na inicialização do semáforo");
-		exit(-1);
+		exit(1);
 	}
 }
 
 void P(sem_t *pSemaforo) {
 	if(sem_wait(pSemaforo) == -1) {
 		fprintf(stderr, "Erro em P");
-		exit(-2);
+		exit(2);
 	}
 }
 
 void V(sem_t *pSemaforo) {
 	if(sem_post(pSemaforo) == -1) {
 		fprintf(stderr, "Erro em V");
-		exit(-3);
+		exit(3);
 	}
 }

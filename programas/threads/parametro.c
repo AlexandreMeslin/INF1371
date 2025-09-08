@@ -13,12 +13,16 @@ void *threadfunc(void *parm);
 
 int main(int argc, char *argv[]) {
 	pthread_t             thread;
-	int                   rc=0;
+	int                   rc;
 	pthread_attr_t        pta;
 	thread_parm_t         *parm=NULL;
 
 	printf("Create a thread attributes object\n");
 	rc = pthread_attr_init(&pta);
+	if(rc) {
+		fprintf(stderr, "pthread_attr_init() failed, rc=%d\n", rc);
+		exit(1);
+	}
 
 	printf("Create thread using the default attributes e vários parâmetros\n");
 	/* Set up multiple parameters to pass to the thread */
@@ -26,11 +30,23 @@ int main(int argc, char *argv[]) {
 	parm->value = 77;
 	strcpy(parm->string, "Inside secondary thread");
 	rc = pthread_create(&thread, &pta, threadfunc, (void *)parm);
+	if(rc) {
+		fprintf(stderr, "pthread_create() failed, rc=%d\n", rc);
+		exit(1);
+	}
 
 	printf("Destroy thread attributes object\n");
 	rc = pthread_attr_destroy(&pta);
-	pthread_join(thread, NULL);
-	
+	if(rc) {
+		fprintf(stderr, "pthread_attr_destroy() failed, rc=%d\n", rc);
+		exit(1);
+	}
+	rc = pthread_join(thread, NULL);
+	if(rc) {
+		fprintf(stderr, "pthread_join() failed, rc=%d\n", rc);
+		exit(1);
+	}
+
 	printf("Main completed\n");
 	return 0;
 }

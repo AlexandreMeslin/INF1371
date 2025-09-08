@@ -19,7 +19,7 @@ int main (void) {
 		pthread_join(vTid[i], NULL);
 
 	if(contagem != NITERACOES * NTHREADS)
-		printf("***Erro de contagem (%u)\n", contagem);
+		printf("***Erro de contagem (%u != %u)\n", contagem, NITERACOES * NTHREADS);
 	else
 		printf("Infelizmente a contagem deu certo (%u)\n", contagem);
 

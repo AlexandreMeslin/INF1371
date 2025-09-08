@@ -35,6 +35,7 @@
 *.i*86
 *.x86_64
 *.hex
+*
 
 # Debug files
 *.dSYM/
@@ -53,3 +54,12 @@ dkms.conf
 
 # debug information files
 *.dwo
+
+# Arquivos temporários
+*~
+*.swp
+*.swo
+*.bak
+*.tmp
+*.temp
+*.log
