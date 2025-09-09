@@ -28,6 +28,9 @@
 
 #define EVER ;;
 
+/*
+ * Estruturas
+ */
 /** Estrutura para armazenar os resultados da série de Fibonacci */
 struct numeros {
     int n;                  // número da série de Fibonacci
@@ -50,12 +53,19 @@ struct thread_parm_t{
     pthread_mutex_t *file_mutex;    // mutex para proteger o acesso ao arquivo
 };
 
-/* Protótipos*/
+/*
+ * Protótipos
+ */
 long fibonacci(int n);
 void registra_resultados(struct numeros *phead, pthread_mutex_t *file_mutex);
 void adiciona_task(struct task **ppFila, struct numeros *phead, pthread_mutex_t *mutex, pthread_cond_t *cond);
 void produtor(struct task **ppFila, int n, pthread_mutex_t *mutex, pthread_cond_t *cond, pthread_mutex_t *file_mutex);
 void *consumer(void *arg);
+
+/*
+ * Variáveis globais 
+ */
+struct timespec inicio; // tempo de início do programa
 
 /**
  * Função principal
@@ -68,7 +78,6 @@ void *consumer(void *arg);
  */
 int main(void) {
     int n = 0;                  /** número de elementos da série de Fibonacci a serem calculados */
-    struct timespec inicio;     /** tempo de início da execução */
     struct task *pFila = NULL;  /** fila de tasks */
     
     pthread_t thread;           /** thread consumidor */
@@ -92,7 +101,7 @@ int main(void) {
 
     printf("Programa de threads de Fibonacci\n");
 
-    clock_gettime(CLOCK_REALTIME, &inicio);
+    clock_gettime(CLOCK_TAI, &inicio);
     for(EVER) {
         // Início de uma task
         produtor(&pFila, n, &mutex, &cond, &file_mutex);
@@ -137,13 +146,15 @@ void registra_resultados(struct numeros *phead, pthread_mutex_t *file_mutex) {
         return;
     }
     while(p != NULL) {
-        fprintf(f, "Fibonacci(%d) = %ld - t = %fs\n", p->n, p->result, p->tempo);
+        fprintf(f, "[%d] Fibonacci(%d) = %ld - t = %fs\n", __LINE__, p->n, p->result, p->tempo);
         struct numeros *temp = p;
         p = p->p_next;
         free(temp);
     }
     fclose(f);
+    fprintf(stderr, "[%d]\n", __LINE__);
     pthread_mutex_unlock(file_mutex);
+    fprintf(stderr, "[%d]\n", __LINE__);
 }
 
 /**
@@ -191,26 +202,25 @@ void adiciona_task(struct task **ppFila, struct numeros *phead, pthread_mutex_t 
  */
 void produtor(struct task **pFila, int n, pthread_mutex_t *mutex, pthread_cond_t *cond, pthread_mutex_t *file_mutex) {
     long resultado; /** resultado da série n de Fibonacci */
-    struct timespec inicio, fim;
+    struct timespec fim;
     struct numeros *phead = NULL;
     struct numeros *p;
 
-    clock_gettime(CLOCK_REALTIME, &inicio);
     for(int i=0; i<n; i++) {
         resultado = fibonacci(i);
+        clock_gettime(CLOCK_TAI, &fim);
+        double tempo_gasto = fim.tv_sec - inicio.tv_sec + (fim.tv_nsec - inicio.tv_nsec) / 1000000000.0;
         p = (struct numeros *)malloc(sizeof(struct numeros));
         if(p == NULL) {
             fprintf(stderr, "Erro de alocação de memória\n");
             exit(1);
         }
-        clock_gettime(CLOCK_REALTIME, &fim);
-        double tempo_gasto = fim.tv_sec - inicio.tv_sec + (fim.tv_nsec - inicio.tv_nsec) / 1000000000.0;
         p->n = i;
         p->result = resultado;
         p->tempo = tempo_gasto;
         p->p_next = phead;
         phead = p;
-        fprintf(stderr, "Fibonacci(%d) = %ld - t = %fs\n", i, resultado, tempo_gasto);
+        fprintf(stderr, "[%d] Fibonacci(%d) = %ld - t = %fs\n", __LINE__, i, resultado, tempo_gasto);
     }
     adiciona_task(pFila, phead, mutex, cond);
 }
@@ -225,18 +235,30 @@ void produtor(struct task **pFila, int n, pthread_mutex_t *mutex, pthread_cond_t
  */
 void *consumer(void *arg) {
     struct thread_parm_t *param;
-    struct task *pFila;
+    struct task *pTask;
 
     param = (struct thread_parm_t *)arg;
 
-    while(1) {
+    for(EVER) {
+        fprintf(stderr, "[%d] Thread consumidor esperando por uma task\n", __LINE__);
         pthread_mutex_lock(param->mutex); // Protege o acesso à fila
+        fprintf(stderr, "[%d] Thread consumidor acordou\n", __LINE__);
+
+        // Espera até que haja uma task na fila
+        // Importante: usar while para evitar wakeup spurious
         while(*(param->pFila) == NULL) {
             pthread_cond_wait(param->cond, param->mutex); // Espera por uma nova task
         }
-        pFila = *(param->pFila);
-        registra_resultados(pFila->phead, param->file_mutex);
-        free(pFila);
+
+        // Retira a task da fila
+        pTask = *(param->pFila);
+        *(param->pFila) = pTask->p_next;
+        pthread_mutex_unlock(param->mutex); // Libera o acesso à fila
+
+        // Processa a task (fora da região crítica)
+        registra_resultados(pTask->phead, param->file_mutex);
+        free(pTask);
     }
+    fprintf(stderr, "[%d] Thread consumidor terminando\n", __LINE__);
     return NULL;
 }

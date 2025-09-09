@@ -22,6 +22,10 @@
 
 #define EVER ;;
 
+/*
+ * Estruturas
+ */
+/** Estrutura para armazenar os resultados da série de Fibonacci */
 struct numeros {
     int n;
     long result;
@@ -29,40 +33,49 @@ struct numeros {
     struct numeros *p_next;
 };
 
+/** Estrutura para passar parâmetros para a thread */
 struct thread_parm_t{
     struct numeros p;
 };
 
+/*
+ * Protótipos
+ */
 long fibonacci(int n);
 void registra_resultados(struct numeros *phead);
+
+/*
+ * Variáveis globais 
+ */
+struct timespec inicio, fim;
+
 
 int main(void) {
     int n = 0;
     long resultado; /** resultado da série n de Fibonacci */
-    struct timespec inicio, fim;
     struct numeros *phead;
     struct numeros *p;
 
     printf("Programa de threads de Fibonacci\n");
 
-    clock_gettime(CLOCK_REALTIME, &inicio);
+    clock_gettime(CLOCK_TAI, &inicio);
     for(EVER) {
         phead = NULL;
         for(int i=0; i<n; i++) {
             resultado = fibonacci(i);
+            clock_gettime(CLOCK_TAI, &fim);
+            double tempo_gasto = fim.tv_sec - inicio.tv_sec + (fim.tv_nsec - inicio.tv_nsec) / 1000000000.0;
             p = (struct numeros *)malloc(sizeof(struct numeros));
             if(p == NULL) {
                 fprintf(stderr, "Erro de alocação de memória\n");
                 exit(1);
             }
-            clock_gettime(CLOCK_REALTIME, &fim);
-            double tempo_gasto = fim.tv_sec - inicio.tv_sec + (fim.tv_nsec - inicio.tv_nsec) / 1000000000.0;
             p->n = i;
             p->result = resultado;
             p->tempo = tempo_gasto;
             p->p_next = phead;
             phead = p;
-            fprintf(stderr, "Fibonacci(%d) = %ld - t = %fs\n", i, resultado, tempo_gasto);
+            fprintf(stderr, "[%d] Fibonacci(%d) = %ld - t = %fs\n", __LINE__, i, resultado, tempo_gasto);
         }
         registra_resultados(phead);
         n++;
