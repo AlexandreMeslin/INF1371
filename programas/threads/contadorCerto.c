@@ -35,6 +35,13 @@ int main (void) {
 	return 0;
 }
 
+/**
+ * Função executada pelas threads.
+ * Incrementa a variável global 'contagem' NITERACOES vezes.
+ * 
+ * @param pArg Ponteiro para argumentos (não utilizado).
+ * @return NULL.
+ */
 void *contador(void *pArg) {
 	int i;
 
@@ -47,6 +54,18 @@ void *contador(void *pArg) {
 	return NULL;
 }
 
+/**
+ * Inicializa um semáforo.
+ * pshared = 0: semáforo entre threads do mesmo processo.
+ * pshared != 0: semáforo entre processos diferentes.
+ * valor: valor inicial do semáforo.
+ * 
+ * Em caso de erro, o programa é abortado.
+ * 
+ * @param pSemaforo Ponteiro para o semáforo a ser inicializado.
+ * @param pshared Indica se o semáforo será compartilhado entre threads ou processos.
+ * @param valor Valor inicial do semáforo.
+ */
 void inicializaSemaforo(sem_t *pSemaforo, int pshared, unsigned valor) {
 	if(sem_init(pSemaforo, pshared, valor) == -1) {
 		fprintf(stderr, "Erro na inicialização do semáforo");
