@@ -56,6 +56,7 @@ struct thread_parm_t{
 /*
  * Protótipos
  */
+
 long fibonacci(int n);
 void registra_resultados(struct numeros *phead, pthread_mutex_t *file_mutex);
 void adiciona_task(struct task **ppFila, struct numeros *phead, pthread_mutex_t *mutex, pthread_cond_t *cond);
@@ -81,19 +82,19 @@ int main(void) {
     struct task *pFila = NULL;  /** fila de tasks */
     
     pthread_t thread;           /** thread consumidor */
-    struct thread_parm_t parm;  /** parâmetros para a thread consumidor */
+    struct thread_parm_t param;  /** parâmetros para a thread consumidor */
     pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;       /** mutex para proteger o acesso à fila */
     pthread_cond_t cond = PTHREAD_COND_INITIALIZER;          /** variável de condição para sinalizar a presença de novas tasks */
     pthread_mutex_t file_mutex = PTHREAD_MUTEX_INITIALIZER;  /** mutex para proteger o acesso ao arquivo */
 
     // Inicializa os parâmetros para a thread consumidor
-    parm.pFila = &pFila;
-    parm.mutex = &mutex;
-    parm.cond = &cond;
-    parm.file_mutex = &file_mutex;
+    param.pFila = &pFila;
+    param.mutex = &mutex;
+    param.cond = &cond;
+    param.file_mutex = &file_mutex;
 
     // Cria a thread consumidor
-    int rc = pthread_create(&thread, NULL, consumer, &parm);
+    int rc = pthread_create(&thread, NULL, consumer, &param);
     if(rc) {
         fprintf(stderr, "Erro ao criar thread consumidor, rc=%d\n", rc);
         exit(1);
@@ -122,19 +123,35 @@ int main(void) {
 /**
  * Cálculo da série de Fibonacci
  * 
+ * Versão iterativa para evitar estouro de pilha
+ * 
  * @param n Número da série a ser calculada
  * @return Resultado da série de Fibonacci
  */
 long fibonacci(int n) {
+    /*
     if (n <= 1)
         return n;
     return fibonacci(n - 1) + fibonacci(n - 2);
+    */
+    // Implementação iterativa para evitar estouro de pilha
+    if (n <= 1)
+        return n;
+    long a = 0, b = 1, c;
+    for(int i = 2; i <= n; i++) {
+        c = a + b;
+        a = b;
+        b = c;
+    }
+    return b;
 }
 
 /**
  * Registra os resultados da série de Fibonacci em um arquivo
  * 
  * @param phead Ponteiro para a cabeça da lista de resultados
+ * @param file_mutex Mutex para proteger o acesso ao arquivo
+ * @return void
  */
 void registra_resultados(struct numeros *phead, pthread_mutex_t *file_mutex) {
     struct numeros *p = phead;
@@ -167,7 +184,10 @@ void registra_resultados(struct numeros *phead, pthread_mutex_t *file_mutex) {
  * 
  * @param ppFila Ponteiro para a cabeça da fila de tasks
  * @param phead Ponteiro para a cabeça da lista de resultados da task
- * 
+ * @param mutex Mutex para proteger o acesso à fila
+ * @param cond Variável de condição para sinalizar a presença de novas tasks
+ * @param file_mutex Mutex para proteger o acesso ao arquivo
+ * @return void
  */
 void adiciona_task(struct task **ppFila, struct numeros *phead, pthread_mutex_t *mutex, pthread_cond_t *cond) {
     struct task *pNew = (struct task *)malloc(sizeof(struct task));
@@ -198,7 +218,12 @@ void adiciona_task(struct task **ppFila, struct numeros *phead, pthread_mutex_t 
  * Cada task calcula a série de Fibonacci para valores de 0 a n-1, onde n é o
  * parâmetro passado para a função.
  * 
+ * @param pFila Ponteiro para a fila de tasks
  * @param n Número de elementos da série de Fibonacci a serem calculados
+ * @param mutex Mutex para proteger o acesso à fila
+ * @param cond Variável de condição para sinalizar a presença de novas tasks
+ * @param file_mutex Mutex para proteger o acesso ao arquivo
+ * @return void
  */
 void produtor(struct task **pFila, int n, pthread_mutex_t *mutex, pthread_cond_t *cond, pthread_mutex_t *file_mutex) {
     long resultado; /** resultado da série n de Fibonacci */
@@ -247,7 +272,9 @@ void *consumer(void *arg) {
         // Espera até que haja uma task na fila
         // Importante: usar while para evitar wakeup spurious
         while(*(param->pFila) == NULL) {
+            // Libera o mutex e espera por uma nova task (pthread_cond_signal)
             pthread_cond_wait(param->cond, param->mutex); // Espera por uma nova task
+            // Ao acordar, o mutex é automaticamente adquirido
         }
 
         // Retira a task da fila
