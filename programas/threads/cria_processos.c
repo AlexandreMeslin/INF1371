@@ -1,11 +1,33 @@
+/**
+ * Programa que cria 1000 processos filhos usando fork()
+ * e mede o tempo total gasto para criar esses processos.
+ * Compilar com: gcc -o cria_processos cria_processos.c -std=c17
+ * 
+ * @author Alexandre Meslin
+ * @date 2025-09-16
+ * @version 1.0
+ * @license MIT
+ */
+
+ /*
+  * Cabeçalhos
+  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
 
+/**
+ * Função principal.
+ * Cria 1000 processos filhos usando fork() e mede o tempo total gasto.
+ * 
+ * @return int Código de saída do programa
+ */
 int main(void) {
     struct timespec inicio; // tempo de início do programa
     struct timespec fim;    // tempo de fim do programa
+
     clock_gettime(CLOCK_MONOTONIC, &inicio);
     for(int i=0; i<1000; i++) {
         pid_t pid = fork();
@@ -19,7 +41,7 @@ int main(void) {
             exit(0);
         } else {
             // Processo pai
-            printf("Processo pai: PID = %d, PPID = %d, Filho PID = %d\n", getpid(), getppid(), pid);
+            //printf("Processo pai: PID = %d, PPID = %d, Filho PID = %d\n", getpid(), getppid(), pid);
             //wait(NULL); // Espera o processo filho terminar
         }
     }
