@@ -1,6 +1,6 @@
 # Laboratório de tcpdump
 
-Alice e Bob (com Sniffer)
+## Alice e Bob (com Sniffer)
 
 ![Alice e Bob (com Sniffer)](imagens/Alice-Bob-Sniffer.png)
 
@@ -55,6 +55,8 @@ Alice e Bob (com Sniffer)
     - Que protocolo aparece?
     - Qual o endereço IP de origem e destino?
     - Qual a diferença entre echo request e echo reply?
+
+---
 
 ## HTTP/HTTPS
 
