@@ -2,7 +2,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main(int argc, char *argv[]) {
+/**
+ * Exemplo de alocação e cópia de string
+ * Aloca memória para uma string, copia um texto para essa memória e depois libera a memória.
+ * Não deve haver vazamento de memória.
+ * Compilar:
+ *   gcc -g -Wall -Wextra -pedantic -O0 -fno-omit-frame-pointer -fno-inline -o vetor-v1 vetor-v1.c
+ * Executar com Valgrind:
+ *   valgrind --leak-check=full ./vetor-v1
+ * @return int
+ */
+int main(void) {
     char pOrigem[] = "Um texto";
     char *pDestino;
 
