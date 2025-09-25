@@ -3,7 +3,7 @@ services:
   alice:
     build:
       context: .
-      dockerfile: Dockerfile.alice
+      dockerfile: Dockerfile.ubuntu
     container_name: alice
     command: sh -c "sleep infinity"
     networks:
@@ -13,7 +13,7 @@ services:
   bob:
     build:
       context: .
-      dockerfile: Dockerfile.bob
+      dockerfile: Dockerfile.ubuntu
     container_name: bob
     command: sh -c "sleep infinity"
     networks:
