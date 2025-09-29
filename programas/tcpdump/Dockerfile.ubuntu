@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 # Instala utilitários básicos de rede
 RUN apt-get update && \

@@ -13,11 +13,16 @@
  * @return int
  */
 int main(void) {
-    char pOrigem[] = "Um texto";
+    char pOrigem[] = "Um texto\0e mais texto";
     char *pDestino;
 
     pDestino = malloc(sizeof pOrigem);
     strcpy(pDestino, pOrigem);
+
+    printf("strlen(pOrigem) = %zu\n", strlen(pOrigem));
+    printf("strlen(pDestino) = %zu\n", strlen(pDestino));
+    printf("sizeof pOrigem = %zu\n", sizeof pOrigem);
+    printf("sizeof pDestino = %zu\n", sizeof pDestino);
 
     puts(pDestino);
     free(pDestino);

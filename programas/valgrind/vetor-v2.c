@@ -15,6 +15,7 @@
  * @return int
  */
 int main(int argc, char *argv[]) {
+    if(argc>0) printf("Programa: %s\n", argv[0]);
     char pOrigem[] = "Um texto";
     char *pDestino;
     int tamanho = strlen(pOrigem);
