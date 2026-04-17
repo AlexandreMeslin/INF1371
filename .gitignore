@@ -63,6 +63,9 @@ dkms.conf
 *.temp
 *.log
 
+# Arquivos de configuração do Visual Studio Code
+.vscode/
+
 # Meu programas binarios
 aloMundo
 contadorErrado
