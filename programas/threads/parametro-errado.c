@@ -1,8 +1,14 @@
+/**
+ * Esta versão modifica os parâmetros antes que cada thread 
+ * obtenha os valores corretos
+ */
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#define N_THREADS	4
 
 // Tipo dos parâmetros da thread
 typedef struct {
@@ -13,7 +19,7 @@ typedef struct {
 void *threadfunc(void *parm);
 
 int main(int argc, char *argv[]) {
-	pthread_t             thread;		// Identificador da thread
+	pthread_t             thread[N_THREADS];// Identificador da thread
 	int                   rc;			// Código de retorno das funções
 	pthread_attr_t        pta;			// Atributos da thread
 	thread_parm_t         *parm=NULL;	// Parâmetros para a thread
@@ -34,12 +40,15 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "malloc() failed\n");
 		exit(1);
 	}
-	parm->value = 77;
-	strcpy(parm->string, "Inside secondary thread");
-	rc = pthread_create(&thread, &pta, threadfunc, (void *)parm);
-	if(rc) {
-		fprintf(stderr, "pthread_create() failed, rc=%d\n", rc);
-		exit(1);
+	// vamos criar n threads
+	for(int i=0; i<N_THREADS; i++) {
+		parm->value = 77 + i;
+		strcpy(parm->string, "Inside secondary thread");
+		rc = pthread_create(&thread[i], &pta, threadfunc, (void *)parm);
+		if(rc) {
+			fprintf(stderr, "pthread_create() failed, rc=%d\n", rc);
+			exit(1);
+		}
 	}
 
 	// Destroy the thread attributes object, since it is no longer needed
@@ -52,10 +61,12 @@ int main(int argc, char *argv[]) {
 
 	// Wait for the thread to complete
 	printf("Wait for thread to complete\n");
-	rc = pthread_join(thread, NULL);
-	if(rc) {
-		fprintf(stderr, "pthread_join() failed, rc=%d\n", rc);
-		exit(1);
+	for(int i=0; i<N_THREADS; i++) {
+		rc = pthread_join(thread[i], NULL);
+		if(rc) {
+			fprintf(stderr, "pthread_join() failed, rc=%d\n", rc);
+			exit(1);
+		}
 	}
 
 	printf("Main completed\n");
@@ -71,6 +82,7 @@ int main(int argc, char *argv[]) {
 void *threadfunc(void *parm) {
 	thread_parm_t *p = (thread_parm_t *)parm;
 	printf("%s, parm = %d\n", p->string, p->value);
+	sleep(30);
 	free(p);
 	return NULL;
 }

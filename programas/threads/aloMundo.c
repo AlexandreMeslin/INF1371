@@ -4,6 +4,11 @@
 
 void *outraThread(void *vargp);
 
+/**
+ Função main.
+ Não recebe parâmetros.
+ Sempre retorna 0.
+ */
 int main (void) {
 	pthread_t tid;	/** Identificador da thread */
 
@@ -17,7 +22,7 @@ int main (void) {
 
 	// Espera pela finalização da thread
 	fprintf(stderr, "Thread criada, esperando pelo término\n");
-	//rc = pthread_join(tid, NULL);
+	rc = pthread_join(tid, NULL);
 	if(rc) {
 		fprintf(stderr, "Erro: pthread_join() retornou %d\n", rc);
 		return 1;
@@ -29,14 +34,14 @@ int main (void) {
 
 /**
  * Função executada pela nova thread
- * Exibe "Alo mundo!" após 30 segundos
+ * Exibe "Alo mundo!" após 10 segundos
  * 
  * @param vargp Argumento passado para a thread (não usado)
  * @return NULL
  */
 void *outraThread(void *vargp) {
 	puts("Nova thread nascendo...");
-	sleep (30);
+	sleep (10);
 	puts("Alo mundo!");
 	return NULL;
 }
