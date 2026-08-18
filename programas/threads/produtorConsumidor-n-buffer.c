@@ -1,3 +1,8 @@
+/**
+ * Exercício: modifique esse código para usar um buffer com N
+ * posições
+ */
+
 #include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
