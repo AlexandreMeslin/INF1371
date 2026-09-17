@@ -13,8 +13,11 @@
  * @return int
  */
 int main(void) {
-    char pOrigem[] = "Um texto\0e mais texto";
+    char pOrigem[] = "Um texto";
     char *pDestino;
+
+    fprintf(stderr, "[DEBUG %d] sizeof pOrigem = %ld\n", __LINE__, sizeof pOrigem);
+    fprintf(stderr, "[DEBUG %d] sizeof pDestino = %ld\n", __LINE__, sizeof pDestino);
 
     pDestino = malloc(sizeof pOrigem);
     strcpy(pDestino, pOrigem);

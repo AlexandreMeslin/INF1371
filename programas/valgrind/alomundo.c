@@ -11,7 +11,7 @@
  * @return int
  */
 int main(int argc, char *argv[]) {
-    puts("Oi Valgrind!");
+    puts("Oi, Valgrind!");
 
     return 0;
 }

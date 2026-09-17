@@ -16,7 +16,7 @@
 int main(void) {
     char *p = malloc(1000);
 
-    printf("Oi Valgrind! (%p)\n", p);
+    printf("Oi, Valgrind! (%p)\n", p);
 
     return 0;
 }
