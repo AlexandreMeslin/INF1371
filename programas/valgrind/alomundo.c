@@ -5,7 +5,7 @@
  * Apenas imprime uma mensagem na tela.
  * O Valgrind não deve reportar nenhum problema.
  * Compilar:
- *   gcc -g -Wall -Wextra -pedantic -O0 -fno-omit-frame-pointer -fno-inline -o alomundo alomundo.c
+ *   gcc -g -Wall -pedantic -O0 -fno-omit-frame-pointer -fno-inline -o alomundo alomundo.c
  * Executar com Valgrind:
  *   valgrind --leak-check=full ./alomundo
  * @return int

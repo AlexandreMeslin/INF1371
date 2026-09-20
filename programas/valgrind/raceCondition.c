@@ -12,7 +12,7 @@ void* increment(void* arg);
  * Isso pode levar a resultados inesperados.
  * Deve ser detectado pelo Valgrind com a ferramenta Helgrind.
  * Compilar:
- *   gcc -g -Wall -Wextra -pedantic -O0 -fno-omit-frame-pointer -fno-inline -o raceCondition raceCondition.c -lpthread
+ *   gcc -g -Wall -pedantic -O0 -fno-omit-frame-pointer -fno-inline -o raceCondition raceCondition.c -lpthread
  * Executar com Valgrind:
  *   valgrind --tool=helgrind ./raceCondition
  * @return int

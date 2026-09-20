@@ -10,6 +10,7 @@
  *   gcc -g -Wall -Wextra -pedantic -O0 -fno-omit-frame-pointer -fno-inline -o alocacao-v1 alocacao-v1.c
  * 
  * Executar com Valgrind:
+ *   valgrind ./alocacao-v1
  *   valgrind --leak-check=full ./alocacao-v1
  * @return int
  */
